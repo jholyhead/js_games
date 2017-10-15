@@ -1,0 +1,278 @@
+<html>
+<head>
+<style>
+#gameCanvas {
+	position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+
+    border-width:10px;
+    border-style: double;
+}
+</style>
+<script>
+(function(){
+
+	const CANVAS_HEIGHT = 600;
+	const CANVAS_WIDTH = 800;
+
+	const PADDLE_THICKNESS = 10;
+    const PADDLE_HEIGHT = 100;
+
+    const MAX_BALL_SPIN = 0.025;
+
+    const WINNING_SCORE = 3;
+    var lScore = 0;
+    var rScore = 0;
+
+    var gameOver = false;
+
+    var canvas;
+    var canvasContext;
+
+    var paddleLY = 250;
+    var paddleRY = 250;
+
+ 	var paddleRSpeed = 20;
+
+    var ballX = CANVAS_WIDTH/2;
+    var ballY = CANVAS_HEIGHT/2;
+
+    const INIT_BALL_SPEED = 10;
+    var ballSpeed = INIT_BALL_SPEED;
+    var ballAngle = getRandomBallAngle();
+
+    var mouseV = 0;
+    var ballSpin = 0;
+
+    var ballSpeedX = 10;
+    var ballSpeedY = 10;
+
+    var prevMouseY = -1;
+
+    const BALL_RADIUS = 10;
+
+    const PI = Math.PI;
+    const TWO_PI = 2 * Math.PI;
+
+    function calculateMousePosition(evt){
+    	var rect = canvas.getBoundingClientRect();
+		var root = document.documentElement;
+		var mouseX = evt.clientX - rect.left - root.scrollLeft;
+		var mouseY = evt.clientY - rect.top - root.scrollTop;
+		var mouseV = 0;
+		if (prevMouseY != -1){
+			mouseV = prevMouseY - mouseY;
+		}
+		prevMouseY = mouseY;
+		return {
+			x:mouseX,
+			y:mouseY, 
+			v:mouseV
+		};
+    }
+
+    window.onload = function(){
+        canvas = document.getElementById('gameCanvas');
+        canvas.height = CANVAS_HEIGHT;
+        canvas.width = CANVAS_WIDTH;
+        canvasContext = canvas.getContext('2d');
+
+        var framesPerSecond = 40;
+        setInterval(function() {
+        	if (!gameOver){
+            	draw();
+            	move();
+            }
+        }, 1000/framesPerSecond);
+
+        canvas.addEventListener('mousemove', 
+        	function(evt) {
+        		var mousePosition = calculateMousePosition(evt);
+        		mouseV = mousePosition.v/400;
+        		paddleLY = mousePosition.y - (PADDLE_HEIGHT/2);
+        	})
+        canvas.addEventListener('mousedown', 
+        	function(evt) {
+        		if (gameOver){
+        			newGame();
+        			gameOver = false;
+        		}
+        	})
+    }
+
+    function draw(){
+        drawRect(0, 0, canvas.width, canvas.height, "black");
+
+        //draw left paddle
+        drawRect(0, paddleLY, PADDLE_THICKNESS, PADDLE_HEIGHT, "white");
+
+        //draw right paddle
+        drawRect(canvas.width - PADDLE_THICKNESS, paddleRY, PADDLE_THICKNESS, PADDLE_HEIGHT, "white");
+
+        //draw the ball
+        drawCircle(ballX, ballY, BALL_RADIUS, "white");
+
+        drawScores();
+
+        drawSpin();
+    }
+
+    function drawRect(x, y, w, h, color){
+        canvasContext.fillStyle = color;
+        canvasContext.fillRect(x, y, w, h);
+    }
+
+    function drawCircle(x, y, r, color) {
+		canvasContext.fillStyle = color;
+		canvasContext.beginPath();
+		canvasContext.arc(x, y, r, 0, Math.PI*2, true);
+		canvasContext.fill();
+	}
+
+	function drawScores(){
+		canvasContext.fillStyle = "white";
+		canvasContext.font = "16px Verdana";
+		canvasContext.fillText(lScore, 100, 100);
+		canvasContext.fillText(rScore, canvas.width-100, 100);
+	}
+
+	function drawSpin(){
+		canvasContext.fillStyle = "white";
+		canvasContext.font = "16px Verdana";
+		canvasContext.fillText(ballSpin, 375, 100);
+	}
+
+	function calculateBallVelocity(){
+		if (ballSpin > MAX_BALL_SPIN) ballSpin = MAX_BALL_SPIN;
+		if (ballSpin < -MAX_BALL_SPIN) ballSpin = -MAX_BALL_SPIN
+		ballSpin = Math.min(0.02, ballSpin)
+		ballAngle += ballSpin;
+		ballSpeedX = ballSpeed * Math.cos(ballAngle);
+		ballSpeedY = ballSpeed * Math.sin(ballAngle);
+
+	}
+
+    function move(){
+    	calculateBallVelocity();
+    	ballX += ballSpeedX;
+    	ballY += ballSpeedY;
+    	if (! detectPaddleBounce()){
+			detectWallBounce();
+    	} else {
+    		ballSpeed++;
+    	}
+    	moveComputerPaddle()
+    	
+    }
+
+    function detectWallBounce(){
+    	if (ballX < 0){
+    		ballAngle = Math.PI - ballAngle;
+    		rScore++;
+    		score();
+    	} else if (ballX > canvas.width){
+    		ballAngle = Math.PI - ballAngle;
+    		lScore++;
+    		score();
+    	} else if (ballY < 0 || ballY > canvas.height){
+    		ballSpin = 0.6 * ballSpin;
+    		ballAngle = 2 * Math.PI - ballAngle;
+    		ballSpeed++;
+    	}
+    }
+
+    function endGame(winningPlayer){
+    	canvasContext.font="32px Verdana";
+    	canvasContext.fillStyle = "white";
+    	canvasContext.fillText(winningPlayer + " Wins!", 300, 200);
+
+    	canvasContext.font="20px Verdana";
+    	canvasContext.fillText("Click to play again", 350, 350);
+
+    	drawScores();
+    	gameOver = true
+    }
+
+    function score(){
+    	if (lScore >= WINNING_SCORE){
+    		endGame("Player 1");
+    	} else if (rScore >= WINNING_SCORE){
+    		endGame("Player 2");
+    	}
+    	ballReset();    	
+    }
+
+    function getRandomBallAngle(){
+    	r = Math.random();
+    	if (r > 0.5){
+    		return 0;
+    	}
+    	return Math.PI;
+    }
+
+
+    function ballReset(){
+		ballX = CANVAS_WIDTH/2;
+		ballY = CANVAS_HEIGHT/2;
+		ballSpeed = INIT_BALL_SPEED;
+		ballAngle =getRandomBallAngle();
+		mouseV = 0;
+		ballSpin = 0;
+		calculateBallVelocity();
+	}
+
+    function newGame(){
+		ballReset();
+		lScore = 0;
+		rScore = 0;
+    }
+
+    function detectPaddleBounce(){
+    	// Detect Left Paddle Bounce
+    	if (ballX <= PADDLE_THICKNESS){
+    		if (ballY > paddleLY && ballY < (paddleLY + PADDLE_HEIGHT)){
+    			ballX = PADDLE_THICKNESS;
+    			deltaY = ballY - (paddleLY + PADDLE_HEIGHT/2);
+	    		ballAngle = (TWO_PI + (PI - ballAngle) - (0.005 * deltaY)) % TWO_PI;
+	    		//prevent ridiculous angles (balls shouldn't bounce off paddles and end up behind)
+	    		if (ballAngle < 5.06 && ballAngle > 3.14){ballAngle = 5.06;}
+	    		if (ballAngle > 1.22 && ballAngle < 3.14){ballAngle = 1.22;}
+	    		ballSpin += mouseV;
+	    		return true;    		
+	    	}
+    	}
+    	if (ballX >= canvas.width - PADDLE_THICKNESS ){		
+    		if(ballY > paddleRY && ballY < paddleRY + PADDLE_HEIGHT){
+    			ballX = CANVAS_WIDTH - PADDLE_THICKNESS;
+    			deltaY = ballY - (paddleRY + PADDLE_HEIGHT/2);
+	    		ballAngle =(TWO_PI + (PI - ballAngle) + (0.005 * deltaY)) % TWO_PI;
+	    		//prevent ridiculous angles (balls shouldn't bounce off paddles and end up behind)
+	    		if (ballAngle < 1.9){ballAngle = 1.9;}
+	    		if (ballAngle > 4.36){ballAngle = 4.36;}
+	    		return true;
+			}			
+    	}
+    	return false;
+    }
+
+    function moveComputerPaddle(){
+    	if (ballY < paddleRY + 5){
+    		paddleRY -= paddleRSpeed;
+    	} else if (ballY > paddleRY + PADDLE_HEIGHT -5){
+    		paddleRY += paddleRSpeed;
+    	}
+    }
+
+
+})();
+</script>
+</head>
+<body>
+    <canvas id="gameCanvas" ></canvas>
+</body>
+</html>
