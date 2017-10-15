@@ -96,6 +96,14 @@
         		mouseV = mousePosition.v/400;
         		paddleLY = mousePosition.y - (PADDLE_HEIGHT/2);
         	})
+
+		canvas.addEventListener('touchmove', 
+        	function(evt) {
+        		var mousePosition = calculateMousePosition(evt);
+        		mouseV = mousePosition.v/400;
+        		paddleLY = mousePosition.y - (PADDLE_HEIGHT/2);
+        	})
+
         canvas.addEventListener('mousedown', 
         	function(evt) {
         		if (gameOver){
