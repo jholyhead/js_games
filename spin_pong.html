@@ -81,8 +81,8 @@
     	var rect = canvas.getBoundingClientRect();
 		var root = document.documentElement;
 
-    	var touchX = evt.touches[0].pageX - rect.left - root.scrollLeft;
-    	var touchY = evt.touches[0].pageY - rect.top - root.scrollTop;;
+    	var touchX = evt.touches[evt.touches.length-1].pageX - rect.left - root.scrollLeft;
+    	var touchY = evt.touches[evt.touches.length-1].pageY - rect.top - root.scrollTop;;
     	var touchV = 0;
     	if (prevTouchY != -1){
 			touchV = prevTouchY - TouchY;
