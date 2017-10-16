@@ -176,22 +176,22 @@
 	}
 
 	function drawScores(){
-		canvasContext.fillStyle = "white";
-		canvasContext.font = "16px Verdana";
-		canvasContext.fillText(lScore, 100, 100);
-		canvasContext.fillText(rScore, canvas.width-100, 100);
+		drawText(lScore, 100, 100, "white", "18px Verdana");
+		drawText(rScore, canvas.width-100, 100, "white", "18px Verdana");
 	}
 
 	function drawSpin(){
-		canvasContext.fillStyle = "white";
-		canvasContext.font = "16px Verdana";
-		canvasContext.fillText(ballSpin, 375, 100);
+		drawText(ballSpin, 375, 100, "red", "16px Verdana");
 	}
 
 	function drawPaddleLY(){
-		canvasContext.fillStyle = "red";
-		canvasContext.font = "16px Verdana";
-		canvasContext.fillText(paddleLY, 375, 100);
+		drawText(paddleLY, 375, 100, "red", "16px Verdana");
+	}
+
+	function drawText(text, x, y, color, font){
+		canvasContext.fillStyle = color;
+		canvasContext.font = font;
+		canvasContext.fillText(text, x, y);	
 	}
 
 	function calculateBallVelocity(){
