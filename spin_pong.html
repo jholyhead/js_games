@@ -78,8 +78,11 @@
     }
 
     function calculateTouchPosition(evt){
-    	var touchX = evt.touches[0].pageX;
-    	var touchY = evt.touches[0].pageY;
+    	var rect = canvas.getBoundingClientRect();
+		var root = document.documentElement;
+
+    	var touchX = evt.touches[0].pageX - rect.left - root.scrollLeft;
+    	var touchY = evt.touches[0].pageY - rect.top - root.scrollTop;;
     	var touchV = 0;
     	if (prevTouchY != -1){
 			touchV = prevTouchY - TouchY;
@@ -113,6 +116,16 @@
         		paddleLY = mousePosition.y - (PADDLE_HEIGHT/2);
         	})
 
+        canvas.addEventListener('touchstart', 
+        	function(evt){
+        		window.blockMenuHeaderScroll = true;
+        	});
+
+        canvas.addEventListener('touchend', 
+        	function(evt){
+        		window.blockMenuHeaderScroll = true;
+        	});
+
 		canvas.addEventListener('touchmove', 
         	function(evt) {
         		var touchPosition = calculateTouchPosition(evt);
@@ -127,6 +140,8 @@
         			gameOver = false;
         		}
         	})
+
+        window.blockMenuHeaderScroll = false;
     }
 
     function draw(){
@@ -174,7 +189,7 @@
 	}
 
 	function drawPaddleLY(){
-		canvasContext.fillStyle = "white";
+		canvasContext.fillStyle = "red";
 		canvasContext.font = "16px Verdana";
 		canvasContext.fillText(paddleLY, 375, 100);
 	}
