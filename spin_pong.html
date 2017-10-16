@@ -118,12 +118,12 @@
 
         canvas.addEventListener('touchstart', 
         	function(evt){
-        		window.blockMenuHeaderScroll = true;
+        		//window.blockMenuHeaderScroll = true;
         	});
 
         canvas.addEventListener('touchend', 
         	function(evt){
-        		window.blockMenuHeaderScroll = true;
+        		//window.blockMenuHeaderScroll = false;
         	});
 
 		canvas.addEventListener('touchmove', 
@@ -141,7 +141,7 @@
         		}
         	})
 
-        window.blockMenuHeaderScroll = false;
+        //window.blockMenuHeaderScroll = false;
     }
 
     function draw(){
