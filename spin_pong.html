@@ -53,6 +53,7 @@
     var ballSpeedY = 10;
 
     var prevMouseY = -1;
+    var prevTouchY = -1;
 
     const BALL_RADIUS = 10;
 
@@ -73,6 +74,21 @@
 			x:mouseX,
 			y:mouseY, 
 			v:mouseV
+		};
+    }
+
+    function calculateTouchPosition(evt){
+    	var touchX = evt.touches[0].pageX;
+    	var touchY = evt.touches[0].pageY;
+    	var touchV = 0;
+    	if (prevTouchY != -1){
+			touchV = prevTouchY - TouchY;
+		}
+		prevTouchY = touchY;
+		return {
+			x:touchX,
+			y:touchY, 
+			v:touchV
 		};
     }
 
@@ -99,9 +115,9 @@
 
 		canvas.addEventListener('touchmove', 
         	function(evt) {
-        		var mousePosition = calculateMousePosition(evt);
-        		mouseV = mousePosition.v/400;
-        		paddleLY = mousePosition.y - (PADDLE_HEIGHT/2);
+        		var touchPosition = calculateTouchPosition(evt);
+        		mouseV = touchPosition.v/400;
+        		paddleLY = touchPosition.y - (PADDLE_HEIGHT/2);
         	})
 
         canvas.addEventListener('mousedown', 
