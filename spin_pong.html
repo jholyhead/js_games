@@ -144,6 +144,8 @@
         drawScores();
 
         //drawSpin();
+
+        drawPaddleLY();
     }
 
     function drawRect(x, y, w, h, color){
@@ -169,6 +171,12 @@
 		canvasContext.fillStyle = "white";
 		canvasContext.font = "16px Verdana";
 		canvasContext.fillText(ballSpin, 375, 100);
+	}
+
+	function drawPaddleLY(){
+		canvasContext.fillStyle = "white";
+		canvasContext.font = "16px Verdana";
+		canvasContext.fillText(paddleLY, 375, 100);
 	}
 
 	function calculateBallVelocity(){
