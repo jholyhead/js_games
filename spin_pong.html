@@ -81,11 +81,11 @@
     	var rect = canvas.getBoundingClientRect();
 		var root = document.documentElement;
 
-    	var touchX = evt.touches[evt.touches.length-1].pageX - rect.left - root.scrollLeft;
-    	var touchY = evt.touches[evt.touches.length-1].pageY - rect.top - root.scrollTop;;
+    	var touchX = evt.touches[0].pageX - rect.left - root.scrollLeft;
+    	var touchY = evt.touches[0].pageY - rect.top - root.scrollTop;;
     	var touchV = 0;
     	if (prevTouchY != -1){
-			touchV = prevTouchY - TouchY;
+			touchV = prevTouchY - touchY;
 		}
 		prevTouchY = touchY;
 		return {
@@ -118,12 +118,12 @@
 
         canvas.addEventListener('touchstart', 
         	function(evt){
-        		//window.blockMenuHeaderScroll = true;
+        		window.blockMenuHeaderScroll = true;
         	});
 
         canvas.addEventListener('touchend', 
         	function(evt){
-        		//window.blockMenuHeaderScroll = false;
+        		window.blockMenuHeaderScroll = false;
         	});
 
 		canvas.addEventListener('touchmove', 
@@ -141,7 +141,7 @@
         		}
         	})
 
-        //window.blockMenuHeaderScroll = false;
+        window.blockMenuHeaderScroll = false;
     }
 
     function draw(){
